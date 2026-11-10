@@ -8,6 +8,7 @@ PyTorch re-implementation of the parallel dual-domain network for sparse-view CT
 | `model.py` | sinogram branch (FCN + Transformer encoders), image branch (U-Net), attention-based fusion module |
 | `train.py` | two-stage training |
 | `test.py` | evaluation on the test patient |
+| `make_fbp_matrix.py` | generates the fan-beam FBP operator `Data/My_AT_256.npz` |
 
 ## 1. Environment
 
@@ -24,8 +25,14 @@ Place the files under `Data/` in the repository root (or pass `--data_dir`):
 
 ```
 Data/
-  My_AT_256.npz                          fan-beam system matrix + FBP filter
+  My_AT_256.npz                          fan-beam FBP operator (generate it, see below)
   mymodel/My_data_public_256_2000.npz    2000 slices, ordered by patient
+```
+
+Generate the FBP operator (a few seconds, about 750 MB):
+
+```bash
+python torch/make_fbp_matrix.py          # -> Data/My_AT_256.npz
 ```
 
 * Source: chest scans of the 2016 NIH-AAPM-Mayo Clinic Low Dose CT Grand Challenge (TCIA), full-dose images,
@@ -34,8 +41,9 @@ Data/
   360 degrees, 357 detectors).
 * `My_data_<dataset>_256_2000.npz`: `f_img` float32 (2000, 360, 357) sinograms; `u_img` float32 (2000, 256, 256) images.
   Patient k occupies slices `[200(k-1), 200k)`.
-* `My_AT_256.npz`: `arr_0` (nnz, 2) int indices [sinogram index, pixel index], `arr_1` (nnz,) values,
-  `arr_2` = (128520, 65536), `arr_3` the 713-tap ramp filter.
+* `My_AT_256.npz`: pixel-driven fan-beam back-projection matrix with 1/L^2 weighting and linear interpolation between
+  detector channels (`arr_0` (nnz, 2) [sinogram index, pixel index], `arr_1` values, `arr_2` = (128520, 65536)) and
+  the 713-tap equiangular ramp filter (`arr_3`); geometry and formulas are documented in `make_fbp_matrix.py`.
 
 ## 3. Data split
 
