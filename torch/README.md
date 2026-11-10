@@ -82,6 +82,8 @@ parallel_p2/    ... + metrics.csv summary.json recon.npy   (written by test.py)
 `summary.json` contains the PSNR / SSIM of the reconstruction and of FBP(linear interpolation), the sinogram PSNR,
 the number of parameters and the inference time per slice.
 
+Pretrained weights: `python torch/test.py --c 4 --ckpt torch/weights/S4.pt`
+
 ## 5. Metrics
 
 PSNR and SSIM are computed over the full 256 x 256 images and averaged over the test slices. SSIM uses

@@ -1,9 +1,9 @@
 """Evaluate a trained network on the test patient.
 
     python torch/test.py --c 4                       # <run dir>/parallel_p2/best.pt
-    python torch/test.py --c 4 --ckpt path/to/ckpt.pt
+    python torch/test.py --c 4 --ckpt torch/weights/S4.pt
 
-Writes next to the checkpoint: metrics<tag>.csv (one row per batch), summary<tag>.json (means, parameters, timing)
+Writes to <out>/<dataset>_patient<k>/S<c>/parallel_p<p>/: metrics<tag>.csv (one row per batch), summary<tag>.json (means, parameters, timing)
 and recon<tag>.npy (float32 (N, 256, 256)).
 """
 import argparse
@@ -35,7 +35,8 @@ def main():
     a = p.parse_args()
     dev = torch.device('cuda')
     ckpt = a.ckpt or os.path.join(run_dir(a), 'parallel_p%d' % a.p, 'best.pt')
-    out = os.path.dirname(os.path.abspath(ckpt))
+    out = os.path.join(run_dir(a), 'parallel_p%d' % a.p)
+    os.makedirs(out, exist_ok=True)
 
     fbp = FBP(os.path.join(a.data_dir, 'My_AT_256.npz'), dev)
     model = ParallelNet(a.c, fbp, p=a.p).to(dev)
