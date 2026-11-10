@@ -1,0 +1,4 @@
+# Python >= 3.9, CUDA GPU
+torch>=2.1
+numpy>=1.23,<2
+scikit-image==0.19.3   # SSIM is computed with this version's default arguments
